@@ -1,6 +1,6 @@
 package net.badprogrammer.platform.shoppingcart.command
 
-import net.badprogrammer.platform.shoppingcart.domain.ShoppingCartId
+import net.badprogrammer.platform.shoppingcart.domain.{User, ShoppingCartId}
 import net.badprogrammer.platform.shoppingcart.query.Query
 
 
@@ -15,7 +15,12 @@ object Cart {
 }
 
 
-case class Create(businessId: String, userId:String) extends Command
+case class Create(businessId: String, userId:String) extends Command {
+
+  val user = User(userId, businessId)
+
+}
+
 
 case class Created(id: ShoppingCartId) extends CartEvent
 

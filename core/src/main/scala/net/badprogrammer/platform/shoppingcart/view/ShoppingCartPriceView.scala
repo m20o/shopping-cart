@@ -1,5 +1,6 @@
 package net.badprogrammer.platform.shoppingcart.view
 
+import akka.actor.Props
 import akka.persistence.PersistentView
 import net.badprogrammer.platform.shoppingcart.aggregate.ShoppingCartPricing
 import net.badprogrammer.platform.shoppingcart.command._
@@ -35,4 +36,9 @@ class ShoppingCartPriceView(val id: ShoppingCartId)
       sender() ! Pricing(pricing.content.map(el => new Element(el._1, el._2)))
     }
   }
+}
+
+object ShoppingCartPriceView {
+
+  def props(id: ShoppingCartId) = Props(classOf[ShoppingCartPriceView], id)
 }

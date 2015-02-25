@@ -1,6 +1,7 @@
 package net.badprogrammer.platform.shoppingcart.handler
 
 import akka.actor._
+import akka.event.Logging
 import net.badprogrammer.platform.shoppingcart.command._
 import net.badprogrammer.platform.shoppingcart.domain.Article
 import net.badprogrammer.platform.shoppingcart.query.GetSummary
@@ -26,45 +27,55 @@ class CommandAndQueryDispatcherSpec extends ActorSpec with BeforeAndAfterEach {
 
       val received = expectMsgType[Received]
 
-      received.who shouldBe "aggregate"
+      received.who shouldBe "cart"
       received.what shouldBe aCommand
     }
 
-    "send all queries to the view" in {
+    "send all queries to the views" in {
 
       handler ! aQuery
 
-      val received = expectMsgType[Received]
+      val received = expectMsgAllConformingOf(classOf[Received], classOf[Received])
 
-      received.who shouldBe "view"
-      received.what shouldBe aQuery
+      received.map(_.what) should (contain only aQuery)
+      received.map(_.who) should (contain allOf("price", "user"))
     }
 
   }
 
-  override protected def beforeEach(): Unit = {
-    handler = system.actorOf(Props(classOf[CommandAndQueryDispatcher], probe("aggregate"), probe("view")))
+  override protected def beforeEach() = {
+
+    handler = system.actorOf(CommandAndQueryDispatcher.props(aggregate("cart"), view("price"), view("user")))
   }
 
 }
 
 object CommandAndQueryDispatcherSpec {
 
-  def probe(name: String) : LocalFactory = context => context.actorOf(Props(classOf[Probe], name))
+
+  def aggregate(name: String) = CommandAndQueryDispatcher.Aggregate(Props(classOf[Probe], name), name)
+
+  def view(name: String) = CommandAndQueryDispatcher.View(Props(classOf[Probe], name), name)
 
   case class Received(who: String, what: Any)
 
   class Probe(who: String) extends Actor {
 
+    val log = Logging(this)
+
     override def receive = {
 
-      case e => sender() ! Received(who, e)
+      case e => {
+        log.debug(s"$who has received $e")
+        sender() ! Received(who, e)
+      }
     }
   }
 
   object Fake extends Command {
     override def toString: String = "I'm the command!"
   }
+
 }
 
 

@@ -1,5 +1,3 @@
 package net.badprogrammer.platform.shoppingcart.domain
 
-class User {
-
-}
+case class User(id: String, context: String)

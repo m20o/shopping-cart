@@ -25,13 +25,6 @@ abstract class ActorSpec(sys: ActorSystem = ActorSystem("CartDomainSystem", Acto
 
 object ActorSpecConfiguration {
 
-  // akka.persistence.journal.leveldb-shared.store.native
-
-  // akka.persistence.journal.leveldb.native = off
-  // akka.persistence.view.auto-update-interval
-
-  //akka.persistence.journal.plugin =
-
   private val loglevel = "INFO"
 
   private val config =

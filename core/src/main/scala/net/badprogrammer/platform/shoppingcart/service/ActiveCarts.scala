@@ -1,42 +1,39 @@
 package net.badprogrammer.platform.shoppingcart.service
 
-import akka.actor.{ActorContext, ActorRef, Props}
+import akka.actor.{ActorContext, ActorRef}
 import net.badprogrammer.platform.shoppingcart.aggregate.ShoppingCartAggregate
-import net.badprogrammer.platform.shoppingcart.command.Cart.{DoesNotExists, Exists}
-import net.badprogrammer.platform.shoppingcart.command.{Cart, Create}
-import net.badprogrammer.platform.shoppingcart.domain.{ShoppingCartId}
+import net.badprogrammer.platform.shoppingcart.domain.{ShoppingCartId, User}
 import net.badprogrammer.platform.shoppingcart.handler._
 import net.badprogrammer.platform.shoppingcart.view.ShoppingCartPriceView
 
 import scala.collection.mutable
 
-class ActiveCarts(repo: ActorRef, idGenerator: ShoppingCartIdFactory)(context: ActorContext) {
+private[service] class ActiveCarts(repo: ActorRef, idGenerator: ShoppingCartIdGenerator)(context: ActorContext) {
 
-  private val byUser: mutable.Map[Create, ShoppingCartId] = mutable.Map.empty
+  private val byUser: mutable.Map[User, ShoppingCartId] = mutable.Map.empty
   private val active: mutable.Map[ShoppingCartId, ActorRef] = mutable.Map.empty
 
+  def get(user: User): Option[ActorRef] = for (id <- byUser.get(user); ref <- active.get(id)) yield ref
 
-  def create(c: Create): Either[Cart.Response, ShoppingCartId] = if (byUser.contains(c)) {
-    Left(Exists)
-  } else {
-    val id = byUser.getOrElseUpdate(c, idGenerator(c))
+  def create(user: User): ShoppingCartId = {
+    val id = byUser.getOrElseUpdate(user, idGenerator(user))
     active.update(id, createHandlerActor(id))
-    Right(id)
+    id
   }
 
-  def retrieve(id: ShoppingCartId): Either[Cart.Response, ActorRef] = active.get(id).map(Right(_)).getOrElse(Left(DoesNotExists))
+  def retrieve(id: ShoppingCartId): Option[ActorRef] = active.get(id)
 
 
   private def createHandlerActor(id: ShoppingCartId): ActorRef = {
-    context.actorOf(Props(classOf[CommandAndQueryDispatcher], aggregateFactory(id), viewFactory(id)))
+    context.actorOf(CommandAndQueryDispatcher.props(aggregateFactory(id), viewFactory(id)))
   }
 
-  private def aggregateFactory(id: ShoppingCartId): LocalFactory = {
-    context => context.actorOf(Props(classOf[ShoppingCartAggregate], id, repo))
+  private def aggregateFactory(id: ShoppingCartId): CommandAndQueryDispatcher.Aggregate = {
+    CommandAndQueryDispatcher.Aggregate(props = ShoppingCartAggregate.props(id, repo), name = "cart")
   }
 
-  private def viewFactory(id: ShoppingCartId): LocalFactory = {
-    context => context.actorOf(Props(classOf[ShoppingCartPriceView], id))
+  private def viewFactory(id: ShoppingCartId): CommandAndQueryDispatcher.View = {
+    CommandAndQueryDispatcher.View(ShoppingCartPriceView.props(id), s"price-${id.value}")
   }
 
 }

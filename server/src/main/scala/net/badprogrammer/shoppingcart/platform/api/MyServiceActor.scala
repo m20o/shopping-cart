@@ -3,8 +3,9 @@ package net.badprogrammer.shoppingcart.platform.api
 import akka.pattern._
 import akka.util.Timeout
 import net.badprogrammer.platform.shoppingcart.command.Cart.Exists
-import net.badprogrammer.platform.shoppingcart.command.{Create, Created}
-import spray.http.{HttpHeaders, StatusCodes}
+import net.badprogrammer.platform.shoppingcart.command.{Create => CreateCart, Created => CartCreated}
+import spray.http.HttpHeaders._
+import spray.http.StatusCodes._
 import spray.routing.HttpService
 
 
@@ -24,6 +25,8 @@ class MyServiceActor extends Actor with MyService {
 }
 
 */
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 // this trait defines our service behavior independently from the service actor
 trait MyService extends HttpService with ApiJsonProtocol with ShoppingCartServiceProvider {
@@ -54,14 +57,10 @@ trait MyService extends HttpService with ApiJsonProtocol with ShoppingCartServic
       } ~
         post {
           entity(as[BusinessContext]) { bc => ctx =>
-
-            import scala.concurrent.ExecutionContext.Implicits.global
-
-            (shoppingCartSystem ? Create(bc.id, bc.user)).map {
-              case Created(id) => ctx.withHttpResponseMapped(_.withHeaders(HttpHeaders.Location(id.value))) complete StatusCodes.Created
-              case Exists => complete(StatusCodes.Conflict)
+            (shoppingCartSystem ? CreateCart(bc.id, bc.user)).map {
+              case CartCreated(id) => ctx.withHttpResponseMapped(_.withHeaders(Location(id.value))) complete Created
+              case Exists => complete(Conflict)
             }
-            //ctx.withHttpResponseMapped(_.withHeaders(HttpHeaders.Location("1234567"))) complete StatusCodes.Created
           }
         }
     }
