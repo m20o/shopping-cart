@@ -9,7 +9,6 @@ class ShoppingCartService(repo: ActorRef, idGenerator: ShoppingCartIdGenerator) 
   private val state: ActiveCarts = new ActiveCarts(repo, idGenerator)(context)
 
   override def receive: Receive = {
-
     case c: Create => state.get(c.user) match {
       case Some(_) => sender() ! Exists
       case None => sender() ! Created(state.create(c.user))
@@ -25,11 +24,9 @@ class ShoppingCartService(repo: ActorRef, idGenerator: ShoppingCartIdGenerator) 
       case Some(ref) => ref forward msg
     }
   }
-
 }
 
 object ShoppingCartService {
-
   def props(repo: ActorRef, idFactory: ShoppingCartIdGenerator) = Props(classOf[ShoppingCartService], repo, idFactory)
 }
 

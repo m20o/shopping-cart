@@ -15,13 +15,8 @@ object Cart {
 }
 
 
-case class Create(businessId: String, userId:String) extends Command {
-
-  val user = User(userId, businessId)
-
-}
-
+case class Create(user: User) extends Command
 
 case class Created(id: ShoppingCartId) extends CartEvent
 
-case class Execute(id: ShoppingCartId, command: Any)
+case class Execute(id: ShoppingCartId, msg: Any)
