@@ -6,7 +6,7 @@ scalaVersion := Version.Scala
 
 fork := true
 
-scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
+scalacOptions := Seq("-unchecked", "-unchecked", "-deprecation", "-encoding", "utf8")
 
 resolvers += "dnvriend at bintray" at "http://dl.bintray.com/dnvriend/maven"
 

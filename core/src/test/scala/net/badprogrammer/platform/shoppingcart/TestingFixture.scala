@@ -18,8 +18,6 @@ object TestingFixture {
 
   object FakeArticleRepository {
 
-    private
-
     class ArticleHander extends Actor {
       def receive: Receive = {
         case q@Quote(_, article, _) if article == Cocaine => sender ! Quote.Unsuccessful(q, "We cannot sell drugs")
