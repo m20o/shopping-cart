@@ -1,12 +1,6 @@
 name := "shopping-cart-core"
 
-version := "1.0"
-
-scalaVersion := Version.Scala
-
 fork := true
-
-scalacOptions := Seq("-unchecked", "-unchecked", "-deprecation", "-encoding", "utf8")
 
 resolvers += "dnvriend at bintray" at "http://dl.bintray.com/dnvriend/maven"
 
