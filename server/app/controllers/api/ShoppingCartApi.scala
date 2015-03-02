@@ -1,20 +1,20 @@
 package controllers.api
 
 import akka.util.Timeout
+import net.badprogrammer.platform.shoppingcart.ShoppingCartSystem
 import net.badprogrammer.platform.shoppingcart.command.Cart.DoesNotExists
 import net.badprogrammer.platform.shoppingcart.command.Execute
 import net.badprogrammer.platform.shoppingcart.domain.ShoppingCartId
 import net.badprogrammer.platform.shoppingcart.query.{CartContent, GetContent}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import setup.ShoppingCartSystemProvider
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-trait ShoppingCartApi extends ApiJsonProtocol{
+trait ShoppingCartApi extends Controller with ApiJsonProtocol {
 
-  this: Controller with ShoppingCartSystemProvider =>
+  def cartSystem: ShoppingCartSystem
 
   import scala.concurrent.ExecutionContext.Implicits.global
 

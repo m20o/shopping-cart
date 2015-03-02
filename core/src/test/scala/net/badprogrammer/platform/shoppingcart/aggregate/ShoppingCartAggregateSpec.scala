@@ -9,7 +9,7 @@ import net.badprogrammer.platform.shoppingcart.testsupport.PersistentActorSpec
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration._
-import scala.language.implicitConversions
+import scala.language.{postfixOps, implicitConversions}
 
 
 class ShoppingCartAggregateSpec extends PersistentActorSpec with BeforeAndAfterEach {

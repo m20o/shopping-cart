@@ -6,4 +6,4 @@ lazy val support = project
 
 lazy val core = project.dependsOn(support)
 
-lazy val server = (project in file("server")).enablePlugins(PlayScala).dependsOn(core).aggregate(core)
+lazy val server = (project in file("server")).enablePlugins(PlayScala).dependsOn(core)

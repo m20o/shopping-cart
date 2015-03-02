@@ -1,30 +1,21 @@
 package controolers.api
 
-import akka.actor.{Props, Actor, ActorSystem, ActorRef}
 import controllers.api.ShoppingCartApi
 import net.badprogrammer.platform.shoppingcart.ShoppingCartSystem
 import net.badprogrammer.platform.shoppingcart.aggregate.ShoppingCartContent
 import net.badprogrammer.platform.shoppingcart.command.Cart.DoesNotExists
 import net.badprogrammer.platform.shoppingcart.command.Execute
-import net.badprogrammer.platform.shoppingcart.domain.{ShoppingCartId, Article}
+import net.badprogrammer.platform.shoppingcart.domain.{Article, ShoppingCartId}
 import net.badprogrammer.platform.shoppingcart.query.{CartContent, GetContent}
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{Json, JsValue}
-import setup.ShoppingCartSystemProvider
-import support.FakeCartSystem
-import scala.concurrent.Future
-
-import org.scalatest._
-import org.scalatestplus.play._
-
-import play.api.mvc._
-import play.api.test._
+import play.api.libs.json.Json
 import play.api.test.Helpers._
+import play.api.test._
+import support.FakeCartSystem
 
 class ShoppingCartApiSpec extends PlaySpec {
 
-  val api = new ShoppingCartApi with Controller with ShoppingCartSystemProvider {
-
+  val api = new ShoppingCartApi {
 
     val cartSystem: ShoppingCartSystem = FakeCartSystem {
       case Execute(id, command) => command match {
