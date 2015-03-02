@@ -53,8 +53,7 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val articleRepository: Actor
   }
 
   private def handleGetCartContentCommand: Receive = {
-    case GetContent if content.isEmpty => sender() ! EmptyCart
-    case GetContent if content.nonEmpty => sender() ! CartContent(content.items)
+    case GetContent => sender() ! CartContent(content.items)
   }
 
   private def rejectUnknownCommand: Receive = {

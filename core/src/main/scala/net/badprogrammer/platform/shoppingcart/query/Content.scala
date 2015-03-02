@@ -1,17 +1,11 @@
 package net.badprogrammer.platform.shoppingcart.query
 
-import net.badprogrammer.platform.shoppingcart.domain.{Article, Item}
+import net.badprogrammer.platform.shoppingcart.domain.Item
 
-sealed abstract class Content(items: Seq[Item])
+case class CartContent(items: List[Item]) {
 
-case class CartContent(items: List[Item]) extends Content(items) {
+  val notEmpty = items.nonEmpty
 
-}
-
-object CartContent {
-
-  def apply(items: (Article, Int)*) = new CartContent(items.map(Item.fromTuple).toList)
+  val isEmpty = items.isEmpty
 
 }
-
-case object EmptyCart extends Content(Seq.empty)

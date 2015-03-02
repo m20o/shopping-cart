@@ -3,12 +3,13 @@ package net.badprogrammer.platform.shoppingcart.aggregate
 import akka.actor._
 import net.badprogrammer.platform.shoppingcart.TestingFixture
 import net.badprogrammer.platform.shoppingcart.command._
-import net.badprogrammer.platform.shoppingcart.domain.ShoppingCartId
+import net.badprogrammer.platform.shoppingcart.domain.{Item, Article, ShoppingCartId}
 import net.badprogrammer.platform.shoppingcart.query._
 import net.badprogrammer.platform.shoppingcart.testsupport.PersistentActorSpec
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration._
+import scala.language.implicitConversions
 
 
 class ShoppingCartAggregateSpec extends PersistentActorSpec with BeforeAndAfterEach {
@@ -26,6 +27,8 @@ class ShoppingCartAggregateSpec extends PersistentActorSpec with BeforeAndAfterE
   override protected def afterEach(): Unit = {
     cart ! PoisonPill
   }
+
+  implicit def articlesToItemList(v: (Article, Int)): List[Item] = List(Item(v._1, v._2))
 
   import net.badprogrammer.platform.shoppingcart.TestingFixture._
 
@@ -112,8 +115,11 @@ class ShoppingCartAggregateSpec extends PersistentActorSpec with BeforeAndAfterE
         cart ! RemoveArticle(HotDog, 2)
       }
 
-      cart ! GetContent
-      expectMsg(EmptyCart)
+      val content = waitingFor[CartContent] {
+        cart ! GetContent
+      }
+
+      content should be('empty)
     }
 
     "be cleared" in {
@@ -125,8 +131,11 @@ class ShoppingCartAggregateSpec extends PersistentActorSpec with BeforeAndAfterE
       cart ! Clear
       expectMsg(CartCleared)
 
-      cart ! GetContent
-      expectMsg(EmptyCart)
+      val content = waitingFor[CartContent] {
+        cart ! GetContent
+      }
+
+      content should be('empty)
     }
 
     "reject unknown commands" in {

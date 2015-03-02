@@ -1,8 +1,10 @@
 package controllers.api
 
 import play.api.mvc.Controller
+import setup.{Global, ShoppingCartSystemProvider}
 
-object ShoppingCart extends Controller {
+object ShoppingCart extends Controller with ShoppingCartApi with ShoppingCartSystemProvider {
 
-  def index() = play.mvc.Results.TODO
+  lazy val cartSystem = Global.cartSystem
+
 }

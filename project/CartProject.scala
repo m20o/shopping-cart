@@ -13,6 +13,4 @@ object CartProject extends Build {
 
   override lazy val settings = super.settings ++ commonSettings
 
-
-
 }
