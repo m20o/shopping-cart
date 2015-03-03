@@ -1,6 +1,5 @@
-package controolers.api
+package controllers.api
 
-import controllers.api.ShoppingCartApi
 import net.badprogrammer.platform.shoppingcart.ShoppingCartSystem
 import net.badprogrammer.platform.shoppingcart.aggregate.ShoppingCart
 import net.badprogrammer.platform.shoppingcart.command.Cart.DoesNotExists
@@ -68,9 +67,9 @@ object Articles {
 
 object KnownCarts {
 
+  import Articles._
+  
   val asJson = Json.parse( """{"items":[{"article":{"id":"pasta with tomato sauce"},"quantity":1},{"article":{"id":"red wine glass"},"quantity":2}, {"article":{"id":"coffee"},"quantity":1}]}""")
-
-  import controolers.api.Articles._
 
   val items = (pasta -> 1) :: (wine -> 2) :: (coffee -> 1) :: Nil
   val prices: Map[Article, Money] = (pasta -> "8.50") :: (wine -> "7.20") :: (coffee -> "1.00") :: Nil map (l => l._1 -> Money(l._2)) toMap
