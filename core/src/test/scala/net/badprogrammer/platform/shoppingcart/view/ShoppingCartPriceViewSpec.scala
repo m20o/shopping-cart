@@ -8,11 +8,11 @@ import net.badprogrammer.platform.shoppingcart.command.{AddArticle, CartEvent, C
 import net.badprogrammer.platform.shoppingcart.domain.{ShoppingCartId, Article, Money}
 import net.badprogrammer.platform.shoppingcart.query.{GetSummary, Pricing}
 import net.badprogrammer.platform.shoppingcart.testsupport.PersistentActorSpec
-import org.scalatest.BeforeAndAfterEach
+import org.scalatest.{GivenWhenThen, BeforeAndAfterEach}
 
 import scala.language.implicitConversions
 
-class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterEach {
+class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterEach with GivenWhenThen {
 
   var cart: ActorRef = _
 
@@ -29,7 +29,7 @@ class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterE
   }
 
   def createViewActorWithId(id: String): ActorRef = {
-    system.actorOf(Props(classOf[ShoppingCartPriceView], ShoppingCartId(id)))
+    system.actorOf(ShoppingCartPriceView.props(ShoppingCartId(id)))
   }
 
   override protected def afterEach(): Unit = {
@@ -50,30 +50,28 @@ class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterE
   }
 
   private def waitForUpdatedView(): Unit = {
-
-    Thread.sleep(20)
-
+    // Ugly hack! There should be a better way...
+    Thread.sleep(30)
     view ! Update(await = true)
-
-    Thread.sleep(20)
+    Thread.sleep(30)
   }
 
   "a price view of an empty shopping cart" must {
 
     "have total price of 0 " in {
 
-      view ! GetSummary
-
-      val summary: Pricing = expectMsgClass(classOf[Pricing])
+      val summary = waitingFor[Pricing] {
+        view ! GetSummary
+      }
 
       summary.total shouldBe Money("0")
     }
 
     "have no items on it" in {
 
-      view ! GetSummary
-
-      val summary: Pricing = expectMsgClass(classOf[Pricing])
+      val summary = waitingFor[Pricing] {
+        view ! GetSummary
+      }
 
       summary.elements should be('empty)
     }
@@ -84,11 +82,12 @@ class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterE
 
     "have total price of 50.50" in {
 
+
       givenCartContaining(Flight -> 1)
 
-      view ! GetSummary
-
-      val summary: Pricing = expectMsgClass(classOf[Pricing])
+      val summary = waitingFor[Pricing] {
+        view ! GetSummary
+      }
 
       summary.total shouldBe Money("50.50")
 
@@ -98,9 +97,9 @@ class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterE
 
       givenCartContaining(Flight -> 1)
 
-      view ! GetSummary
-
-      val summary: Pricing = expectMsgClass(classOf[Pricing])
+      val summary = waitingFor[Pricing] {
+        view ! GetSummary
+      }
 
       summary.elements should (have size 1 and contain(Pricing.Element(Flight -> 1, Money("50.50"))))
     }
@@ -108,15 +107,15 @@ class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterE
 
   "a price view of a shopping cart containing one flight and two hot-dog" must {
 
-    def givenCartContainingTheseTwoArticles = givenCartContaining(Flight -> 1, HotDog -> 2)
+    def givenCartContainingTheseTwoArticles: Unit = givenCartContaining(Flight -> 1, HotDog -> 2)
 
     "have total price of (50.50 + 2 * 10.10) = 70.70" in {
 
       givenCartContainingTheseTwoArticles
 
-      view ! GetSummary
-
-      val summary: Pricing = expectMsgClass(classOf[Pricing])
+      val summary = waitingFor[Pricing] {
+        view ! GetSummary
+      }
 
       summary.total shouldBe Money("70.70")
 
@@ -126,7 +125,7 @@ class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterE
 
       givenCartContainingTheseTwoArticles
 
-      val summary: Pricing = waitingFor[Pricing] {
+      val summary = waitingFor[Pricing] {
         view ! GetSummary
       }
 
@@ -141,9 +140,9 @@ class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterE
 
       waitForUpdatedView()
 
-      view ! GetSummary
-
-      val summary: Pricing = expectMsgClass(classOf[Pricing])
+      val summary = waitingFor[Pricing] {
+        view ! GetSummary
+      }
 
       summary.total shouldBe Money("60.60")
       summary.elements should (have size 2 and contain allOf(Pricing.Element(Flight -> 1, Money("50.50")), Pricing.Element(HotDog -> 1, Money("10.10"))))
@@ -157,9 +156,9 @@ class ShoppingCartPriceViewSpec extends PersistentActorSpec with BeforeAndAfterE
 
       waitForUpdatedView()
 
-      view ! GetSummary
-
-      val summary: Pricing = expectMsgClass(classOf[Pricing])
+      val summary = waitingFor[Pricing] {
+        view ! GetSummary
+      }
 
       summary.total shouldBe Money.Zero
 

@@ -2,16 +2,18 @@ package controolers.api
 
 import controllers.api.ShoppingCartApi
 import net.badprogrammer.platform.shoppingcart.ShoppingCartSystem
-import net.badprogrammer.platform.shoppingcart.aggregate.ShoppingCartContent
+import net.badprogrammer.platform.shoppingcart.aggregate.ShoppingCart
 import net.badprogrammer.platform.shoppingcart.command.Cart.DoesNotExists
 import net.badprogrammer.platform.shoppingcart.command.Execute
-import net.badprogrammer.platform.shoppingcart.domain.{Article, ShoppingCartId}
+import net.badprogrammer.platform.shoppingcart.domain.{Article, Money, ShoppingCartId}
 import net.badprogrammer.platform.shoppingcart.query.{CartContent, GetContent}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test._
 import support.FakeCartSystem
+
+import scala.language.postfixOps
 
 class ShoppingCartApiSpec extends PlaySpec {
 
@@ -56,19 +58,34 @@ class ShoppingCartApiSpec extends PlaySpec {
   }
 }
 
+object Articles {
+
+  val pasta = Article("pasta with tomato sauce")
+  val wine = Article("red wine glass")
+  val coffee = Article("coffee")
+}
+
 
 object KnownCarts {
 
-  val asJson = Json.parse( """{"items":[{"article":{"id":"food"},"quantity":1},{"article":{"id":"wine"},"quantity":1}]}""")
+  val asJson = Json.parse( """{"items":[{"article":{"id":"pasta with tomato sauce"},"quantity":1},{"article":{"id":"red wine glass"},"quantity":2}, {"article":{"id":"coffee"},"quantity":1}]}""")
+
+  import controolers.api.Articles._
+
+  val items = (pasta -> 1) :: (wine -> 2) :: (coffee -> 1) :: Nil
+  val prices: Map[Article, Money] = (pasta -> "8.50") :: (wine -> "7.20") :: (coffee -> "1.00") :: Nil map (l => l._1 -> Money(l._2)) toMap
+
 
   val full = {
-    val c = new ShoppingCartContent()
-    c.add(Article("food"), 1)
-    c.add(Article("wine"), 1)
+    val c = new ShoppingCart()
+    items.foreach { i =>
+      c.add(i)
+      c.updateQuotation(i._1 -> prices(i._1))
+    }
     c
   }
 
-  val carts = Map.empty + (ShoppingCartId("full") -> full) + (ShoppingCartId("empty") -> new ShoppingCartContent())
+  val carts = Map.empty + (ShoppingCartId("full") -> full) + (ShoppingCartId("empty") -> new ShoppingCart())
 
   def apply(id: ShoppingCartId): Option[CartContent] = carts.get(id).map { x => CartContent(x.items)}
 

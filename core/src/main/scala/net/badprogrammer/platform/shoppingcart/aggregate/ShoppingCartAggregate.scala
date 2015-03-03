@@ -7,11 +7,11 @@ import net.badprogrammer.platform.shoppingcart.command._
 import net.badprogrammer.platform.shoppingcart.domain._
 import net.badprogrammer.platform.shoppingcart.query._
 
-class ShoppingCartAggregate(val id: ShoppingCartId, val articleRepository: ActorRef) extends PersistentActor with ActorLogging {
+class ShoppingCartAggregate(val id: ShoppingCartId, val articleCatalog: ActorRef) extends PersistentActor with ActorLogging {
 
   val persistenceId: String = id.value
 
-  private val content = new ShoppingCartContent()
+  private val content = new ShoppingCart()
 
   private val bus = context.system.eventStream
 
@@ -28,7 +28,7 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val articleRepository: Actor
   }
 
   private def handleAddArticleCommand: Receive = {
-    case AddArticle(article, quantity) => articleRepository ! Quote(sender(), article, quantity)
+    case AddArticle(article, quantity) => articleCatalog ! Quote(sender(), article, quantity)
 
     case q@Quote.Unsuccessful(quote, reason) => notifyThatArticleIsNotAvailable(q)
     case q@Quote.Successful(quote, price) => handleAddAvailableArticle(q)
@@ -64,7 +64,7 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val articleRepository: Actor
     event match {
       case e: ArticleAdded => addArticleToCart(e)
       case e: ArticleRemoved => removeArticleFromCart(e)
-      case CartCleared => content.empty
+      case CartCleared => content.clear
     }
   }
 
@@ -86,10 +86,10 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val articleRepository: Actor
 
   private def persistAndUpdateQuotation(article: Article, money: Money): Unit = {
     persist(ArticleQuoted(article, money)) { event =>
+      content.updateQuotation(article -> money)
       bus.publish(event)
     }
   }
-
 }
 
 object ShoppingCartAggregate {
