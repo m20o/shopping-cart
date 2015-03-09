@@ -7,13 +7,13 @@ import net.badprogrammer.platform.shoppingcart.command._
 import net.badprogrammer.platform.shoppingcart.domain._
 import net.badprogrammer.platform.shoppingcart.query._
 
-class ShoppingCartAggregate(val id: ShoppingCartId, val articleCatalog: ActorRef) extends PersistentActor with ActorLogging {
+class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) extends PersistentActor with ActorLogging {
 
-  val persistenceId: String = id.value
+  def persistenceId: String = self.path.name
 
   private val content = new ShoppingCart()
 
-  private val bus = context.system.eventStream
+  private def bus = context.system.eventStream
 
   override def receiveRecover: Receive = {
     case e: ContentEvent => updateContent(e)
@@ -28,7 +28,7 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val articleCatalog: ActorRef
   }
 
   private def handleAddArticleCommand: Receive = {
-    case AddArticle(article, quantity) => articleCatalog ! Quote(sender(), article, quantity)
+    case AddArticle(article, quantity) => catalog ! Quote(sender(), article, quantity)
 
     case q@Quote.Unsuccessful(quote, reason) => notifyThatArticleIsNotAvailable(q)
     case q@Quote.Successful(quote, price) => handleAddAvailableArticle(q)
@@ -94,6 +94,6 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val articleCatalog: ActorRef
 
 object ShoppingCartAggregate {
 
-  def props(id: ShoppingCartId, articleRepository: ActorRef) = Props(classOf[ShoppingCartAggregate], id, articleRepository)
+  def props(id: ShoppingCartId, catalog: ActorRef) = Props(classOf[ShoppingCartAggregate], id, catalog)
 
 }

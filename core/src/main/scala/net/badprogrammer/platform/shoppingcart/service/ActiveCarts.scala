@@ -11,21 +11,19 @@ import scala.collection.mutable
 private[service] class ActiveCarts(repo: ActorRef, idGenerator: ShoppingCartIdGenerator)(context: ActorContext) {
 
   private val byUser: mutable.Map[User, ShoppingCartId] = mutable.Map.empty
-  private val active: mutable.Map[ShoppingCartId, ActorRef] = mutable.Map.empty
 
-  def get(user: User): Option[ActorRef] = for (id <- byUser.get(user); ref <- active.get(id)) yield ref
+  def get(user: User): Option[ActorRef] = for (id <- byUser.get(user); ref <- retrieve(id)) yield ref
 
   def create(user: User): ShoppingCartId = {
     val id = byUser.getOrElseUpdate(user, idGenerator(user))
-    active.update(id, createHandlerActor(id))
+    createHandlerActor(id)
     id
   }
 
-  def retrieve(id: ShoppingCartId): Option[ActorRef] = active.get(id)
-
+  def retrieve(id: ShoppingCartId): Option[ActorRef] = context.child(id.value)
 
   private def createHandlerActor(id: ShoppingCartId): ActorRef = {
-    context.actorOf(CommandAndQueryDispatcher.props(aggregateFactory(id), viewFactory(id)))
+    context.actorOf(CommandAndQueryDispatcher.props(aggregateFactory(id), viewFactory(id)), id.value)
   }
 
   private def aggregateFactory(id: ShoppingCartId): CommandAndQueryDispatcher.Aggregate = {
