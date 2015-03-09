@@ -4,10 +4,10 @@ import java.nio.charset.Charset
 import java.security.MessageDigest
 
 case class Sha256(bytes: Array[Byte]) {
-  lazy val asHexString: String=  BigInt(bytes).formatted("%64x")
+  val asHexString: String = BigInt(bytes).abs.formatted("%64x").toUpperCase
 }
 
-case object Sha256 {
+object Sha256 {
 
   private val UTF8 = Charset.forName("UTF-8")
 
