@@ -3,8 +3,6 @@ package net.badprogrammer.platform.shoppingcart.service
 import akka.actor.{ActorContext, ActorRef}
 import net.badprogrammer.platform.shoppingcart.aggregate.ShoppingCartAggregate
 import net.badprogrammer.platform.shoppingcart.domain.{ShoppingCartId, User}
-import net.badprogrammer.platform.shoppingcart.handler._
-import net.badprogrammer.platform.shoppingcart.view.ShoppingCartPriceView
 
 import scala.collection.mutable
 
@@ -23,15 +21,6 @@ private[service] class ActiveCarts(repo: ActorRef, idGenerator: ShoppingCartIdGe
   def retrieve(id: ShoppingCartId): Option[ActorRef] = context.child(id.value)
 
   private def createHandlerActor(id: ShoppingCartId): ActorRef = {
-    context.actorOf(CommandAndQueryDispatcher.props(aggregateFactory(id), viewFactory(id)), id.value)
+    context.actorOf(ShoppingCartAggregate.props(id, repo), id.value)
   }
-
-  private def aggregateFactory(id: ShoppingCartId): CommandAndQueryDispatcher.Aggregate = {
-    CommandAndQueryDispatcher.Aggregate(props = ShoppingCartAggregate.props(id, repo), name = "cart")
-  }
-
-  private def viewFactory(id: ShoppingCartId): CommandAndQueryDispatcher.View = {
-    CommandAndQueryDispatcher.View(ShoppingCartPriceView.props(id), s"price-${id.value}")
-  }
-
 }

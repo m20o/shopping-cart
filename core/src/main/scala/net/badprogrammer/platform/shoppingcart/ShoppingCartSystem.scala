@@ -4,7 +4,7 @@ import akka.actor.{Props, Actor, ActorSystem, ActorRef}
 import akka.util.Timeout
 import com.typesafe.config.Config
 import net.badprogrammer.platform.shoppingcart.domain.{Quote, Money, Article}
-import net.badprogrammer.platform.shoppingcart.service.{DefaultShoppingCartIdFactory, ShoppingCartService}
+import net.badprogrammer.platform.shoppingcart.service.{AllShoppingCarts, DefaultShoppingCartIdFactory, AllShoppingCarts$}
 
 import scala.concurrent._
 import akka.pattern._
@@ -64,7 +64,7 @@ object LocalShoppingCartSystemFactory extends ShoppingCartSystemFactory {
 
     private val system = ActorSystem("shopping-cart-system", config)
 
-    val reference: ActorRef = system.actorOf(ShoppingCartService.props(FakeArticleRepository(system), DefaultShoppingCartIdFactory))
+    val reference: ActorRef = system.actorOf(AllShoppingCarts.props(FakeArticleRepository(system)))
 
     override def terminate: Unit = system.shutdown()
   }

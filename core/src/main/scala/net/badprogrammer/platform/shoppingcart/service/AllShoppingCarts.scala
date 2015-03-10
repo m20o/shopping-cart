@@ -4,9 +4,9 @@ import akka.actor.{ActorRef, Props, Actor}
 import net.badprogrammer.platform.shoppingcart.command.Cart.{DoesNotExists, Exists}
 import net.badprogrammer.platform.shoppingcart.command._
 
-class ShoppingCartService(repo: ActorRef, idGenerator: ShoppingCartIdGenerator) extends Actor {
+class AllShoppingCarts(catalog: ActorRef, generator: ShoppingCartIdGenerator) extends Actor {
 
-  private val state: ActiveCarts = new ActiveCarts(repo, idGenerator)(context)
+  private val state: ActiveCarts = new ActiveCarts(catalog, generator)(context)
 
   override def receive: Receive = {
     case c: Create => state.get(c.user) match {
@@ -26,8 +26,8 @@ class ShoppingCartService(repo: ActorRef, idGenerator: ShoppingCartIdGenerator) 
   }
 }
 
-object ShoppingCartService {
-  def props(repo: ActorRef, idFactory: ShoppingCartIdGenerator) = Props(classOf[ShoppingCartService], repo, idFactory)
+object AllShoppingCarts {
+  def props(repo: ActorRef)(implicit idFactory: ShoppingCartIdGenerator) = Props(classOf[AllShoppingCarts], repo, idFactory)
 }
 
 

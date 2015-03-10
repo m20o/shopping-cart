@@ -7,9 +7,9 @@ import net.badprogrammer.platform.shoppingcart.domain.{User, ShoppingCartId}
 import net.badprogrammer.platform.shoppingcart.testsupport.ActorSpec
 import org.scalatest.BeforeAndAfter
 
-class ShoppingCartServiceSpec extends ActorSpec with BeforeAndAfter {
+class AllShoppingCartsSpec extends ActorSpec with BeforeAndAfter {
 
-  val ref = system.actorOf(ShoppingCartService.props(FakeArticleRepository(system), DefaultShoppingCartIdFactory))
+  val ref = system.actorOf(AllShoppingCarts.props(FakeArticleRepository(system)))
 
   def user(id: String) = User(id, "GREAT_SITE")
 
