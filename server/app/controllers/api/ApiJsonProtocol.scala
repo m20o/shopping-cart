@@ -1,7 +1,7 @@
 package controllers.api
 
-import net.badprogrammer.platform.shoppingcart.domain.{Article, Item}
-import net.badprogrammer.platform.shoppingcart.query.CartContent
+import net.badprogrammer.platform.shoppingcart.command.CartContent
+import net.badprogrammer.platform.shoppingcart.domain.{User, Article, Item}
 import play.api.libs.json._
 
 trait ApiJsonProtocol {
@@ -10,6 +10,8 @@ trait ApiJsonProtocol {
 
   implicit val itemFormat: Format[Item] = Json.format[Item]
 
-  implicit  val cartContentFormat: Format[CartContent] = Json.format[CartContent]
+  implicit val cartContentFormat: Format[CartContent] = Json.format[CartContent]
+
+  implicit val userFormat: Format[User] = Json.format[User]
 
 }

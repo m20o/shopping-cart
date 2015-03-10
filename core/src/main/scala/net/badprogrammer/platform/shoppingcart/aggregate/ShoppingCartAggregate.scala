@@ -5,7 +5,6 @@ import akka.event.LoggingReceive
 import akka.persistence.PersistentActor
 import net.badprogrammer.platform.shoppingcart.command._
 import net.badprogrammer.platform.shoppingcart.domain._
-import net.badprogrammer.platform.shoppingcart.query._
 
 class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) extends PersistentActor with ActorLogging {
 

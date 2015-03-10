@@ -11,15 +11,13 @@ case class Quote(source: ActorRef, article: Article, quantity: Int) extends Orig
 
 object Quote {
 
-  sealed trait Response extends OriginalSender {
-
-    def quote: Quote
+  sealed abstract class Response(quote: Quote) extends OriginalSender {
 
     lazy val source = quote.source
   }
 
-  case class Successful(quote: Quote, price: Money) extends Response
+  case class Successful(quote: Quote, price: Money) extends Response(quote)
 
-  case class Unsuccessful(quote: Quote, reason: String) extends Response
+  case class Unsuccessful(quote: Quote, reason: String) extends Response(quote)
 
 }

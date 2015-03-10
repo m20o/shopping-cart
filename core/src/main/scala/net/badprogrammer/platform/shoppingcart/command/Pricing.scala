@@ -1,4 +1,4 @@
-package net.badprogrammer.platform.shoppingcart.query
+package net.badprogrammer.platform.shoppingcart.command
 
 import net.badprogrammer.platform.shoppingcart.domain.{Item, Money}
 

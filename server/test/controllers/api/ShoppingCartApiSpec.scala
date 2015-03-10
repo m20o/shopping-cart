@@ -2,19 +2,21 @@ package controllers.api
 
 import net.badprogrammer.platform.shoppingcart.ShoppingCartSystem
 import net.badprogrammer.platform.shoppingcart.aggregate.ShoppingCart
-import net.badprogrammer.platform.shoppingcart.command.Cart.DoesNotExists
-import net.badprogrammer.platform.shoppingcart.command.Execute
-import net.badprogrammer.platform.shoppingcart.domain.{Article, Money, ShoppingCartId}
-import net.badprogrammer.platform.shoppingcart.query.{CartContent, GetContent}
+import net.badprogrammer.platform.shoppingcart.service.Cart
+import Cart.{DoesNotExists, Execute}
+import net.badprogrammer.platform.shoppingcart.command.{CartContent, GetContent}
+import net.badprogrammer.platform.shoppingcart.domain.{Article, Money, ShoppingCartId, User}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test._
 import support.FakeCartSystem
 
+import scala.concurrent.Future
 import scala.language.postfixOps
 
-class ShoppingCartApiSpec extends PlaySpec {
+class ShoppingCartApiSpec extends PlaySpec with ApiJsonProtocol {
 
   val api = new ShoppingCartApi {
 
@@ -55,6 +57,21 @@ class ShoppingCartApiSpec extends PlaySpec {
       returned must be(KnownCarts.asJson)
     }
   }
+
+  "POST /carts" must {
+
+    val johnDoe = User("jdoe", "SITE1")
+
+    "create a new cart if the given user hasn't one" in {
+
+      val result = api.create().apply(FakeRequest(POST, "/carts").withJsonBody(Json.toJson(johnDoe)))
+
+      val future: Future[Result] = result.run
+
+      status(future) mustBe CREATED
+      contentAsString(future) mustBe "aaaaa"
+    }
+  }
 }
 
 object Articles {
@@ -67,8 +84,8 @@ object Articles {
 
 object KnownCarts {
 
-  import Articles._
-  
+  import controllers.api.Articles._
+
   val asJson = Json.parse( """{"items":[{"article":{"id":"pasta with tomato sauce"},"quantity":1},{"article":{"id":"red wine glass"},"quantity":2}, {"article":{"id":"coffee"},"quantity":1}]}""")
 
   val items = (pasta -> 1) :: (wine -> 2) :: (coffee -> 1) :: Nil

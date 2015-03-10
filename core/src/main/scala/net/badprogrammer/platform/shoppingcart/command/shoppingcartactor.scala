@@ -1,6 +1,6 @@
 package net.badprogrammer.platform.shoppingcart.command
 
-import net.badprogrammer.platform.shoppingcart.domain.{Article, Money}
+import net.badprogrammer.platform.shoppingcart.domain.{Item, Article, Money}
 
 
 case class UnknownCommand(command: Any)
@@ -20,3 +20,13 @@ case object CartCleared extends ContentEvent
 case class RemoveArticle(article: Article, quantity: Int = 1) extends Command
 
 case class ArticleRemoved(article: Article, quantity: Int) extends ContentEvent
+
+case object GetContent extends Query
+
+case class CartContent(items: List[Item]) {
+
+  val notEmpty = items.nonEmpty
+
+  val isEmpty = items.isEmpty
+
+}

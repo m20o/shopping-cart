@@ -1,7 +1,7 @@
 package net.badprogrammer.platform.shoppingcart.service
 
-import akka.actor.{ActorRef, Props, Actor}
-import net.badprogrammer.platform.shoppingcart.command.Cart.{DoesNotExists, Exists}
+import akka.actor.{Actor, ActorRef, Props}
+import Cart._
 import net.badprogrammer.platform.shoppingcart.command._
 
 class AllShoppingCarts(catalog: ActorRef, generator: ShoppingCartIdGenerator) extends Actor {

@@ -2,7 +2,7 @@ package controllers.api
 
 import setup.Global
 
-object ShoppingCart extends ShoppingCartApi  {
+object ShoppingCartController extends ShoppingCartApi  {
 
   lazy val cartSystem = Global.cartSystem
 

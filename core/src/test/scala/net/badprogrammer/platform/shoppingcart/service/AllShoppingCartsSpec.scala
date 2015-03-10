@@ -1,9 +1,9 @@
 package net.badprogrammer.platform.shoppingcart.service
 
 import net.badprogrammer.platform.shoppingcart.TestingFixture._
-import net.badprogrammer.platform.shoppingcart.command.Cart.{Check, DoesNotExists, Exists}
+import Cart._
 import net.badprogrammer.platform.shoppingcart.command._
-import net.badprogrammer.platform.shoppingcart.domain.{User, ShoppingCartId}
+import net.badprogrammer.platform.shoppingcart.domain.{ShoppingCartId, User}
 import net.badprogrammer.platform.shoppingcart.testsupport.ActorSpec
 import org.scalatest.BeforeAndAfter
 

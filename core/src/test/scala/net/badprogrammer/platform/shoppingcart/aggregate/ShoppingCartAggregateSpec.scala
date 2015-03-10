@@ -3,13 +3,12 @@ package net.badprogrammer.platform.shoppingcart.aggregate
 import akka.actor._
 import net.badprogrammer.platform.shoppingcart.TestingFixture
 import net.badprogrammer.platform.shoppingcart.command._
-import net.badprogrammer.platform.shoppingcart.domain.{Item, Article, ShoppingCartId}
-import net.badprogrammer.platform.shoppingcart.query._
+import net.badprogrammer.platform.shoppingcart.domain.{Article, Item, ShoppingCartId}
 import net.badprogrammer.platform.shoppingcart.testsupport.PersistentActorSpec
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration._
-import scala.language.{postfixOps, implicitConversions}
+import scala.language.{implicitConversions, postfixOps}
 
 
 class ShoppingCartAggregateSpec extends PersistentActorSpec with BeforeAndAfterEach {
