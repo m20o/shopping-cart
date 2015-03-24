@@ -6,7 +6,6 @@ object Dependencies extends Build {
   private val Resolvers = Seq("jdgoldie at bintray" at "http://dl.bintray.com/jdgoldie/maven")
 
   def ScalaTest: ModuleID = "org.scalatest" %% "scalatest" % Version.ScalaTest % "test"
-  def ScalaTestPlus: ModuleID = "org.scalatestplus" %% "play" % "1.2.0" % "test"
 
   def Akka: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % Version.Akka,

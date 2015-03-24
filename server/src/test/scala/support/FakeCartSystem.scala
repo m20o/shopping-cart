@@ -2,7 +2,7 @@ package support
 
 import akka.actor.{Actor, ActorRef}
 import akka.util.Timeout
-import net.badprogrammer.platform.shoppingcart.ShoppingCartSystem
+import net.badprogrammer.shoppingcart.api.ShoppingCartSystem
 
 import scala.concurrent.Future
 

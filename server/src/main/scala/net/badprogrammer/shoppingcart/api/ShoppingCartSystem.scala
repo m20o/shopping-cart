@@ -1,4 +1,4 @@
-package net.badprogrammer.platform.shoppingcart
+package net.badprogrammer.shoppingcart.api
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.pattern._

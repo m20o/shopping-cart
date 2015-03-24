@@ -1,7 +1,8 @@
 package setup
 
 import com.typesafe.config.ConfigFactory
-import net.badprogrammer.platform.shoppingcart.{ShoppingCartSystem, LocalShoppingCartSystemFactory}
+import net.badprogrammer.platform.shoppingcart.LocalShoppingCartSystemFactory
+import net.badprogrammer.shoppingcart.api.{LocalShoppingCartSystemFactory, ShoppingCartSystem}
 import play.api.{Application, GlobalSettings}
 
 object Global extends GlobalSettings {

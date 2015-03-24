@@ -1,12 +1,12 @@
 package controllers.api
 
 import akka.util.Timeout
-import net.badprogrammer.platform.shoppingcart.ShoppingCartSystem
 import net.badprogrammer.platform.shoppingcart.service.Cart
 import Cart.{Create, DoesNotExists, Execute}
 import net.badprogrammer.platform.shoppingcart.command._
 import net.badprogrammer.platform.shoppingcart.domain.{ShoppingCartId, User}
-import play.api.libs.json.{JsError, Json}
+import net.badprogrammer.shoppingcart.api.ShoppingCartSystem
+import play.api.libs.json.{JsResult, JsError, Json}
 import play.api.mvc.{Action, BodyParsers, Controller}
 
 import scala.concurrent.Future
@@ -33,18 +33,31 @@ trait ShoppingCartApi extends Controller with ApiJsonProtocol {
 
   def create() = Action.async(BodyParsers.parse.json) {
     request =>
-      val result = request.body.validate[User]
-      Future.successful {
-        result.fold(
-          errors => {
-            BadRequest(JsError.toFlatJson(errors))
-          },
+        Future(Ok)
+    /*
+    val result = request.body.validate[User]
 
-          user => {
-            cartSystem.send(Create(user))
-            InternalServerError("The end")
-          }
-        )
-      }
+    Future.successful {
+      result.fold(
+        errors => {
+          BadRequest(JsError.toFlatJson(errors))
+        },
+
+        user => {
+          cartSystem.send(Create(user))
+          InternalServerError("The end")
+        }
+      )
+    }
+    */
+  }
+
+  def prova() = Action(BodyParsers.parse.json) { req =>
+
+    val result: JsResult[User] = req.body.validate[User]
+
+    result.get
+
+    Created
   }
 }
