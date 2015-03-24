@@ -2,10 +2,9 @@ package controllers.api
 
 import net.badprogrammer.platform.shoppingcart.ShoppingCartSystem
 import net.badprogrammer.platform.shoppingcart.aggregate.ShoppingCart
-import net.badprogrammer.platform.shoppingcart.service.Cart
-import Cart.{DoesNotExists, Execute}
 import net.badprogrammer.platform.shoppingcart.command.{CartContent, GetContent}
 import net.badprogrammer.platform.shoppingcart.domain.{Article, Money, ShoppingCartId, User}
+import net.badprogrammer.platform.shoppingcart.service.Cart.{DoesNotExists, Execute}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.mvc.Result

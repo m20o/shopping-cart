@@ -1,18 +1,17 @@
 package net.badprogrammer.platform.shoppingcart
 
-import akka.actor.{Props, Actor, ActorSystem, ActorRef}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.pattern._
 import akka.util.Timeout
 import com.typesafe.config.Config
-import net.badprogrammer.platform.shoppingcart.domain.{Quote, Money, Article}
-import net.badprogrammer.platform.shoppingcart.service.{AllShoppingCarts, DefaultShoppingCartIdFactory, AllShoppingCarts$}
+import net.badprogrammer.platform.shoppingcart.domain.{Article, Money, Quote}
+import net.badprogrammer.platform.shoppingcart.service.{AllShoppingCarts, DefaultShoppingCartIdFactory}
 
 import scala.concurrent._
-import akka.pattern._
 
 trait ActorSystemProvider {
 
   def system: ActorSystem
-
 
 }
 
@@ -23,7 +22,6 @@ trait ShoppingCartSystem {
   def send(message: Any)(implicit timeout: Timeout): Future[Any] = reference ? message
 
   def terminate: Unit
-
 
 }
 

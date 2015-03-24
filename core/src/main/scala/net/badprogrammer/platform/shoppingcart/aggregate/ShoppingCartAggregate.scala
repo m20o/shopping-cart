@@ -28,7 +28,6 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) exten
 
   private def handleAddArticleCommand: Receive = {
     case AddArticle(article, quantity) => catalog ! Quote(sender(), article, quantity)
-
     case q@Quote.Unsuccessful(quote, reason) => notifyThatArticleIsNotAvailable(q)
     case q@Quote.Successful(quote, price) => handleAddAvailableArticle(q)
   }
