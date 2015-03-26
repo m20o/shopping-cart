@@ -1,6 +1,6 @@
 
 
-object Version {
+object Versions {
 
   def Akka = "2.3.9"
 

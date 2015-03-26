@@ -1,1 +1,0 @@
-name := "shopping-cart-support"

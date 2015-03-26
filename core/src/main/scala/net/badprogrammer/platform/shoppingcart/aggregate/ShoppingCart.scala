@@ -6,7 +6,7 @@ class ShoppingCart(private var quantities: Map[Article, Int] = Map.empty, privat
 
   def contains(article: Article): Boolean = quantities.contains(article)
 
-  def clear: Unit = quantities = Map.empty
+  def clear(): Unit = quantities = Map.empty
 
   def remove(article: Article, quantity: Int): Unit = {
     val residualQuantity = quantities.get(article).map(_ - quantity).filter(_ > 0).getOrElse(0)

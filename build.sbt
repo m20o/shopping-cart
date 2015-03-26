@@ -1,9 +1,10 @@
 name := "shopping-cart-platform"
 
-lazy val root = (project in file(".")).aggregate(support, core, server)
+version := "1.0"
 
-lazy val support = project
+scalaVersion := Versions.Scala
 
-lazy val core = project.dependsOn(support)
+lazy val root = (project in file(".")).aggregate(core)
 
-lazy val server = (project in file("server")).dependsOn(core)
+lazy val core = project
+
