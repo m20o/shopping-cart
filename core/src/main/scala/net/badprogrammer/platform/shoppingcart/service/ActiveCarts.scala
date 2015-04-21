@@ -6,21 +6,15 @@ import net.badprogrammer.platform.shoppingcart.domain.{ShoppingCartId, User}
 
 import scala.collection.mutable
 
-private[service] class ActiveCarts(repo: ActorRef, idGenerator: ShoppingCartIdGenerator)(context: ActorContext) {
+private[service] class ActiveCarts(catalog: ActorRef)(context: ActorContext) {
 
   private val byUser: mutable.Map[User, ShoppingCartId] = mutable.Map.empty
 
-  def get(user: User): Option[ActorRef] = for (id <- byUser.get(user); ref <- retrieve(id)) yield ref
+  def existsFor(id: ShoppingCartId): Boolean = get(id).isDefined
 
-  def create(user: User): ShoppingCartId = {
-    val id = byUser.getOrElseUpdate(user, idGenerator(user))
-    createHandlerActor(id)
-    id
-  }
+  def get(id: ShoppingCartId): Option[ActorRef] = context.child(id.value)
 
   def retrieve(id: ShoppingCartId): Option[ActorRef] = context.child(id.value)
 
-  private def createHandlerActor(id: ShoppingCartId): ActorRef = {
-    context.actorOf(ShoppingCartAggregate.props(id, repo), id.value)
-  }
+  def create(id: ShoppingCartId): Unit = context.actorOf(ShoppingCartAggregate.props(id, catalog), id.value)
 }

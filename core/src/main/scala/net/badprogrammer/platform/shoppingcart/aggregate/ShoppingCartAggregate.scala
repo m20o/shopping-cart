@@ -8,14 +8,28 @@ import net.badprogrammer.platform.shoppingcart.domain._
 
 class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) extends PersistentActor with ActorLogging {
 
-  def persistenceId: String = self.path.name
-
   private val content = new ShoppingCart()
 
-  private def bus = context.system.eventStream
+  def persistenceId: String = self.path.name
 
   override def receiveRecover: Receive = {
     case e: ContentEvent => updateContent(e)
+  }
+
+  private def updateContent(event: ContentEvent) = {
+    event match {
+      case e: ArticleAdded => addArticleToCart(e)
+      case e: ArticleRemoved => removeArticleFromCart(e)
+      case CartCleared => content.clear
+    }
+  }
+
+  private def removeArticleFromCart(removed: ArticleRemoved) {
+    content.remove(removed.article, removed.quantity)
+  }
+
+  private def addArticleToCart(added: ArticleAdded) {
+    content.add(added.article, added.quantity)
   }
 
   def receiveCommand = LoggingReceive {
@@ -25,6 +39,8 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) exten
       handleGetCartContentCommand orElse
       rejectUnknownCommand
   }
+
+  private def bus = context.system.eventStream
 
   private def handleAddArticleCommand: Receive = {
     case AddArticle(article, quantity) => catalog ! Quote(sender(), article, quantity)
@@ -58,22 +74,6 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) exten
     case x => sender() ! UnknownCommand(x)
   }
 
-  private def updateContent(event: ContentEvent) = {
-    event match {
-      case e: ArticleAdded => addArticleToCart(e)
-      case e: ArticleRemoved => removeArticleFromCart(e)
-      case CartCleared => content.clear
-    }
-  }
-
-  private def removeArticleFromCart(removed: ArticleRemoved) {
-    content.remove(removed.article, removed.quantity)
-  }
-
-  private def addArticleToCart(added: ArticleAdded) {
-    content.add(added.article, added.quantity)
-  }
-
   private def persistEventAndUpdateContent(e: ContentEvent, replyTo: ActorRef = sender()) {
     persist(e) { event =>
       updateContent(event)
@@ -91,7 +91,5 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) exten
 }
 
 object ShoppingCartAggregate {
-
   def props(id: ShoppingCartId, catalog: ActorRef) = Props(classOf[ShoppingCartAggregate], id, catalog)
-
 }
