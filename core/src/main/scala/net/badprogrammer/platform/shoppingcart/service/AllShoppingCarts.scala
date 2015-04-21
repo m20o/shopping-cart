@@ -14,27 +14,7 @@ class AllShoppingCarts(catalog: ActorRef, generator: ShoppingCartIdGenerator) ex
 
   private val state: ActiveCarts = new ActiveCarts(catalog)(context)
 
-  def otherreceive: Receive = {
 
-    case Cart.Check(id) => state.retrieve(id) match {
-      case None => sender() ! DoesNotExists
-      case Some(_) => sender() ! Exists
-    }
-
-    case Execute(id, msg) => state.retrieve(id) match {
-      case None => sender() ! DoesNotExists
-      case Some(ref) => ref forward msg
-    }
-  }
-
-  def checkCartExistence(id: ShoppingCartId): Unit = {
-
-    sender() ! state.get(id).map(x => Cart.Exists).getOrElse(DoesNotExists)
-  }
-
-  def forwardToCart(id: ShoppingCartId, message: Message): Unit = {
-    state.get(id).foreach(_ forward message)
-  }
 
   override def receiveCommand: Receive = {
     case Create(user) => tryCreateCartFor(user)
@@ -57,6 +37,14 @@ class AllShoppingCarts(catalog: ActorRef, generator: ShoppingCartIdGenerator) ex
           sender() ! ev
       }
     }
+  }
+
+  private def checkCartExistence(id: ShoppingCartId): Unit = {
+    sender() ! state.get(id).map(x => Cart.Exists).getOrElse(DoesNotExists)
+  }
+
+  private def forwardToCart(id: ShoppingCartId, message: Message): Unit = {
+    state.get(id).foreach(_ forward message)
   }
 }
 
