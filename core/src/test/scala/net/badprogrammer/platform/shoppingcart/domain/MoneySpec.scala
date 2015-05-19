@@ -1,6 +1,6 @@
 package net.badprogrammer.platform.shoppingcart.domain
 
-import net.badprogrammer.platform.shoppingcart.testsupport.CompleteWordSpec
+import net.badprogrammer.platform.testsupport.CompleteWordSpec
 
 
 class MoneySpec extends CompleteWordSpec {

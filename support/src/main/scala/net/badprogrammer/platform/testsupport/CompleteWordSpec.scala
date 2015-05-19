@@ -1,4 +1,4 @@
-package net.badprogrammer.platform.shoppingcart.testsupport
+package net.badprogrammer.platform.testsupport
 
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 

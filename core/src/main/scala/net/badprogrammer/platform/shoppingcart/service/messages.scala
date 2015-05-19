@@ -7,6 +7,7 @@ import net.badprogrammer.platform.shoppingcart.domain.{ShoppingCartId, User}
 object Cart {
 
   case class Check(id: ShoppingCartId) extends Query
+  case class FindByUser(user: User) extends Query
 
   trait Response
 
@@ -16,7 +17,7 @@ object Cart {
 
   case class Create(user: User) extends Command
 
-  case class Created(id: ShoppingCartId) extends CartEvent
+  case class Created(user: User, id: ShoppingCartId) extends CartEvent
 
   case class Execute(id: ShoppingCartId, msg: Message)
 

@@ -4,7 +4,7 @@ import akka.actor._
 import net.badprogrammer.platform.shoppingcart.TestingFixture
 import net.badprogrammer.platform.shoppingcart.command._
 import net.badprogrammer.platform.shoppingcart.domain.{Article, Item, ShoppingCartId}
-import net.badprogrammer.platform.shoppingcart.testsupport.PersistentActorSpec
+import net.badprogrammer.platform.testsupport.PersistentActorSpec
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration._
@@ -16,16 +16,15 @@ class ShoppingCartAggregateSpec extends PersistentActorSpec with BeforeAndAfterE
   var cart: ActorRef = _
 
   override protected def beforeEach(): Unit = {
-    cart = createCartActorWithId(nextId("test-cart"))
+    cart = createCartActorWithId(sequentialId("cart"))
   }
 
   def createCartActorWithId(id: String): ActorRef = {
     system.actorOf(ShoppingCartAggregate.props(ShoppingCartId(id), TestingFixture.FakeArticleRepository(system)), id)
   }
 
-  override protected def afterEach(): Unit = {
-    cart ! PoisonPill
-  }
+  override protected def afterEach(): Unit = terminate(cart)
+
 
   implicit def articlesToItemList(v: (Article, Int)): List[Item] = List(Item(v._1, v._2))
 
@@ -147,7 +146,7 @@ class ShoppingCartAggregateSpec extends PersistentActorSpec with BeforeAndAfterE
 
   "A non-empty cart " which {
 
-    val cartId = nextId("my-cart")
+    val cartId = "my-cart"
 
     "is killed at some time" in {
       val persistent = createCartActorWithId(cartId)

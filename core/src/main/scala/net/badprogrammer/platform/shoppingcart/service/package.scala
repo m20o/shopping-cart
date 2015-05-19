@@ -12,6 +12,5 @@ package object service {
     private def generateSha256Hex(user: User) = Sha256(s"${user.id}-${user.context}").asHexString
 
     override def apply(user: User): ShoppingCartId = ShoppingCartId(generateSha256Hex(user))
-
   }
 }
