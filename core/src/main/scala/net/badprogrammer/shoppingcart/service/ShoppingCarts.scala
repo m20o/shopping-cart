@@ -1,6 +1,7 @@
 package net.badprogrammer.shoppingcart.service
 
-import akka.actor.{ActorContext, ActorRef, Props}
+import akka.actor._
+import akka.event.Logging.MDC
 import akka.persistence.PersistentActor
 import Cart._
 import net.badprogrammer.shoppingcart.aggregate.ShoppingCartAggregate
@@ -8,7 +9,7 @@ import net.badprogrammer.shoppingcart.command.Message
 import net.badprogrammer.shoppingcart.domain.{ShoppingCartId, User}
 
 // il problema e' tutto qui
-class ShoppingCarts(catalog: ActorRef, generator: ShoppingCartIdGenerator) extends PersistentActor {
+class ShoppingCarts(catalog: ActorRef, generator: ShoppingCartIdGenerator) extends PersistentActor with DiagnosticActorLogging {
 
   val persistenceId: String = ShoppingCarts.ID
 

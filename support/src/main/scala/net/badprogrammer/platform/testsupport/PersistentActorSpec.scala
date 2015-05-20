@@ -18,10 +18,17 @@ abstract class PersistentActorSpec(sys: ActorSystem = ActorSystems.InMemoryPersi
   def ignoring[T: ClassTag]: Unit = {
     val tag: ClassTag[T] = implicitly[ClassTag[T]]
     val clazz: Class[_] = tag.runtimeClass
-    ignoreMsg { case t => t.getClass.isAssignableFrom(clazz)}
+    ignoreMsg { case t => t.getClass.isAssignableFrom(clazz) }
   }
 
-  def waitFor(duration: FiniteDuration) = Thread.sleep(duration.toMillis)
+  def waitAtMost[T](duration: FiniteDuration, expected: T)(block: => Any) = {
+    block
+    val received = receiveWhile(duration) {
+      case x if x == expected => expected
+      case other => block
+    }
+    assert(expected == received.last)
+  }
 
   def sequentialId(name: String) = s"$name-${next()}"
 
@@ -40,8 +47,10 @@ abstract class PersistentActorSpec(sys: ActorSystem = ActorSystems.InMemoryPersi
 
   private object next {
     private val counter: AtomicInteger = new AtomicInteger(0)
+
     def apply() = counter.incrementAndGet()
   }
+
 }
 
 

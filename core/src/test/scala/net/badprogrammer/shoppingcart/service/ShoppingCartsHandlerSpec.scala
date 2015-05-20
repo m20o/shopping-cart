@@ -1,13 +1,12 @@
 package net.badprogrammer.shoppingcart.service
 
 import akka.actor.ActorRef
-import net.badprogrammer.shoppingcart.TestingFixture
-import TestingFixture._
-import Cart._
 import net.badprogrammer.platform.testsupport.PersistentActorSpec
+import net.badprogrammer.shoppingcart.TestingFixture
+import net.badprogrammer.shoppingcart.TestingFixture._
 import net.badprogrammer.shoppingcart.command.{AddArticle, ArticleAdded}
-import net.badprogrammer.shoppingcart.domain.{User, ShoppingCartId}
-import net.badprogrammer.shoppingcart.service.Cart.{DoesNotExists, Exists, Created}
+import net.badprogrammer.shoppingcart.domain.{ShoppingCartId, User}
+import net.badprogrammer.shoppingcart.service.Cart.{Created, DoesNotExists, Exists, _}
 import org.scalatest.BeforeAndAfter
 
 import scala.collection.mutable.Map
@@ -80,16 +79,21 @@ class ShoppingCartsHandlerSpec extends PersistentActorSpec with BeforeAndAfter {
 
     "find existing carts by user" in {
 
-      val first: User = user("fancycustomer@gmail.com")
+      val u = user("fancycustomer@gmail.com")
+
+      val id = createCartFor(u)
+
+      waitAtMost(200 millis, Some(id)) {
+        ref ! FindByUser(u)
+      }
+    }
+
+    "return NONE if cart does not exists for an user" in {
       val second: User = user("none@gmail.com")
 
-      val id = createCartFor(first)
-
-      waitFor(200 millis)
-
-      ref ! FindByUser(first)
       ref ! FindByUser(second)
-      expectMsgAllOf(Some(id), None)
+
+      expectMsgAllOf(None)
     }
 
     "forward all commands to the specified cart" in {
