@@ -3,10 +3,11 @@ package net.badprogrammer.shoppingcart.api
 import akka.actor.ActorRefFactory
 import net.badprogrammer.platform.testsupport.ActorSystems
 import net.badprogrammer.shoppingcart.domain.ShoppingCartId
-import net.badprogrammer.shoppingcart.service.ShoppingCartIdGenerator
+import net.badprogrammer.shoppingcart.service.{Cart, ShoppingCartIdGenerator}
+import org.scalatest.{BeforeAndAfter, GivenWhenThen}
 import spray.http.StatusCodes
 
-class ShoppingCartApiSpec extends SpraySpec with ShoppingCartApi {
+class ShoppingCartApiSpec extends SpraySpec with ShoppingCartApi with BeforeAndAfter {
 
   val actorRefFactory: ActorRefFactory = ActorSystems.InMemoryPersistence
 
@@ -15,13 +16,13 @@ class ShoppingCartApiSpec extends SpraySpec with ShoppingCartApi {
   "The Api" should {
 
     val caller = Caller("jdoe", "nowhere.com")
-
-    val expected = "jdoe~nowhere.com"
+    val cartId = "jdoe~nowhere.com"
 
     "create a new shopping cart" in {
+
       Post("/carts", caller) ~> routes ~> check {
         assert(status === StatusCodes.Created)
-        assert(responseAs[String] === expected)
+        assert(responseAs[String] === cartId)
       }
     }
 
@@ -32,9 +33,24 @@ class ShoppingCartApiSpec extends SpraySpec with ShoppingCartApi {
     }
 
     "add an article to a shopping cart" in {
-      Put(s"/carts/$expected/articles", "food") ~> routes ~> check {
-        assert(status === StatusCodes.OK)
-        assert(responseAs[CartItem] === CartItem("food", "food", 1))
+      Put(s"/carts/$cartId/articles", "food") ~> routes ~> check {
+        assert(status == StatusCodes.OK)
+        assert(responseAs[CartItem] == CartItem("food", "food", 1))
+      }
+    }
+
+    "add the same article multiple times" in {
+
+      Put(s"/carts/$cartId/articles", "food") ~> routes ~> check {
+        assert(status == StatusCodes.OK)
+      }
+
+      Put(s"/carts/$cartId/articles", "food") ~> routes ~> check {
+        assert(status == StatusCodes.OK)
+      }
+
+      Get(s"/carts/$cartId/articles/food") ~> routes ~> check {
+        responseAs[CartItem] should be(CartItem("food", "food", 3))
       }
     }
   }

@@ -32,7 +32,10 @@ class ShoppingCart(private var quantities: Map[Article, Int] = Map.empty, privat
 
   def apply(article: Article): Option[Int] = quantities.get(article)
 
-  def updateQuotation(quotation: (Article, Money)): Unit = quotes = quotes + quotation
+  def updateQuotation(quotation: (Article, Money)): Unit = {
+    quotes = quotes + quotation
+    println(">>> " + quotes)
+  }
 
   def quotations: Map[Item, Money] = for ((article, price) <- quotes; quantity <- quantities.get(article)) yield new Item(article, quantity) -> price
 }

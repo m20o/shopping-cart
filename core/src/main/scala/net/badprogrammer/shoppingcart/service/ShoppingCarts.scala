@@ -45,7 +45,8 @@ class ShoppingCarts(catalog: ActorRef, generator: ShoppingCartIdGenerator) exten
   }
 
   private def forwardToCart(id: ShoppingCartId, message: Message): Unit = {
-    carts.get(id).foreach(_ forward message)
+    log.debug("Forward {} to {}", message, id)
+    carts.get(id).map(_ forward message).getOrElse(sender() ! DoesNotExists)
   }
 }
 

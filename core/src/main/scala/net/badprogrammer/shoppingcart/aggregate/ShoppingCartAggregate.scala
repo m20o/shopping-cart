@@ -4,7 +4,7 @@ import akka.actor.{ActorLogging, ActorRef, Props}
 import akka.event.LoggingReceive
 import akka.persistence.PersistentActor
 import net.badprogrammer.shoppingcart.command._
-import net.badprogrammer.shoppingcart.domain.{Quote, Article, Money, ShoppingCartId}
+import net.badprogrammer.shoppingcart.domain.{Article, Money, Quote, ShoppingCartId}
 
 class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) extends PersistentActor with ActorLogging {
 
@@ -42,8 +42,18 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) exten
 
   private def bus = context.system.eventStream
 
+  def logging(handler: String)(block : => Receive): Receive = {
+    case x => {
+      log.debug("Handler {} received {}", handler, x)
+      block(x)
+    }
+  }
+
   private def handleAddArticleCommand: Receive = {
-    case AddArticle(article, quantity) => catalog ! Quote(sender(), article, quantity)
+    case AddArticle(article, quantity) => {
+      log.debug("Bon, mando a {}", catalog.path)
+      catalog ! Quote(sender(), article, quantity)
+    }
     case q@Quote.Unsuccessful(quote, reason) => notifyThatArticleIsNotAvailable(q)
     case q@Quote.Successful(quote, price) => handleAddAvailableArticle(q)
   }

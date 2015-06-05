@@ -1,16 +1,20 @@
 package net.badprogrammer.shoppingcart.api
 
-import akka.actor.{ActorRef, ActorRefFactory, Props, Actor}
+import akka.actor._
 import net.badprogrammer.shoppingcart.domain.{Money, Quote}
 
 import scala.util.Random
 
-class RandomArticleHandler extends Actor {
+class RandomArticleHandler extends Actor with ActorLogging{
 
   val random = new Random()
 
-  override def receive: Receive = {
-    case q: Quote => Quote.Successful(q, Money(BigDecimal(random.nextInt(1000))))
+  def receive: Receive = {
+    case q: Quote => {
+      log.debug("Received {} from {}", q, sender())
+      sender() ! Quote.Successful(q, Money(BigDecimal(random.nextInt(1000))))
+    }
+    case other => throw new RuntimeException("Invalid message: "+other)
   }
 }
 

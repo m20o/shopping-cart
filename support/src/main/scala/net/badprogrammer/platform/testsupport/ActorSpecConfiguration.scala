@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory
 
 object ActorSpecConfiguration {
 
-  private val loglevel = "INFO"
+  private val loglevel = "debug"
 
   private val config =
     s"""

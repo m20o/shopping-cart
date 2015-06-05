@@ -2,7 +2,6 @@ package net.badprogrammer.shoppingcart.service
 
 import akka.actor.ActorRef
 import net.badprogrammer.platform.testsupport.PersistentActorSpec
-import net.badprogrammer.shoppingcart.TestingFixture
 import net.badprogrammer.shoppingcart.TestingFixture._
 import net.badprogrammer.shoppingcart.command.{AddArticle, ArticleAdded}
 import net.badprogrammer.shoppingcart.domain.{ShoppingCartId, User}
@@ -98,13 +97,7 @@ class ShoppingCartsHandlerSpec extends PersistentActorSpec with BeforeAndAfter {
 
     "forward all commands to the specified cart" in {
 
-      ref ! Create(user("first@gmail.com"))
-      ref ! Create(user("second@gmail.com"))
-
-      val (first, second) = {
-        val res = expectMsgAllClassOf(classOf[Created], classOf[Created]).map(_.id)
-        (res.head, res(1))
-      }
+      val (first, second) = (createCartFor(user("first@gmail.com")), createCartFor(user("second@gmail.com")))
 
       ref ! Execute(first, AddArticle(Flight))
       ref ! Execute(second, AddArticle(HotDog))
@@ -119,9 +112,7 @@ class ShoppingCartsHandlerSpec extends PersistentActorSpec with BeforeAndAfter {
 
     "is stopped at some time" in {
 
-      terminator = waitingFor[Created] {
-        ref ! Create(user("t1000@cyberdyne.com"))
-      }.id
+      terminator = createCartFor(user("t1000@cyberdyne.com"))
 
       terminate(ref)
     }

@@ -1,7 +1,7 @@
 package net.badprogrammer.shoppingcart
 
 import akka.actor._
-import net.badprogrammer.shoppingcart.domain.{Article, Quote, Money}
+import net.badprogrammer.shoppingcart.domain.{Article, Money, Quote}
 
 object TestingFixture {
 
@@ -18,15 +18,14 @@ object TestingFixture {
 
   object FakeArticleRepository {
 
-    class ArticleHander extends Actor {
+    class ArticleHander extends Actor with ActorLogging {
       def receive: Receive = {
         case q@Quote(_, article, _) if article == Cocaine => sender ! Quote.Unsuccessful(q, "We cannot sell drugs")
         case q@Quote(_, article, _) if article != Cocaine => sender ! Quote.Successful(q, pricing(article))
-        case x => println(s"WTF is $x")
+        case x => log.error("Uknonwn article: {}", x)
       }
     }
 
     def apply(implicit system: ActorSystem) = system.actorOf(Props[ArticleHander])
   }
-
 }
