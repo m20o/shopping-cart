@@ -42,20 +42,14 @@ class ShoppingCartAggregate(val id: ShoppingCartId, val catalog: ActorRef) exten
 
   private def bus = context.system.eventStream
 
-  def logging(handler: String)(block : => Receive): Receive = {
-    case x => {
-      log.debug("Handler {} received {}", handler, x)
-      block(x)
-    }
-  }
-
   private def handleAddArticleCommand: Receive = {
-    case AddArticle(article, quantity) => {
-      log.debug("Bon, mando a {}", catalog.path)
-      catalog ! Quote(sender(), article, quantity)
-    }
+    case AddArticle(article, quantity) => requestQuotationFor(article, quantity)
     case q@Quote.Unsuccessful(quote, reason) => notifyThatArticleIsNotAvailable(q)
     case q@Quote.Successful(quote, price) => handleAddAvailableArticle(q)
+  }
+
+  def requestQuotationFor(article: Article, quantity: Int): Unit = {
+    catalog ! Quote(sender(), article, quantity)
   }
 
   private def notifyThatArticleIsNotAvailable(failure: Quote.Unsuccessful): Unit = {
