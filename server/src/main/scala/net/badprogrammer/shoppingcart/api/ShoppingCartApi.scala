@@ -23,20 +23,20 @@ trait ShoppingCartApi extends ShoppingCartApplication with ShoppingCartProtocols
 
   lazy val service = new ActorSystemGateway(carts, context)
 
-  def routes: Route = CreateShoppingCart1 ~ AddArticleToCart ~ RetriveCartItem
+  def routes: Route = CreateShoppingCart ~ AddArticleToCart ~ RetrieveCartItem
 
   implicit val timeout = Timeout(3 second)
 
-  def GetShoppingCart = pathPrefix("carts" / IntNumber) {
+  def GetShoppingCart = pathPrefix("carts" / Segment) {
     s =>
       get {
         complete {
-          (carts ? Execute(ShoppingCartId(s.toString), GetContent)).mapTo[CartContent].map(CartAdapter.apply)
+          (carts ? Execute(ShoppingCartId(s), GetContent)).mapTo[CartContent].map(CartAdapter.apply)
         }
       }
   }
 
-  def CreateShoppingCart1 = path("carts") {
+  def CreateShoppingCart = path("carts") {
     post {
       entity(as[Caller]) { caller =>
         complete {
@@ -51,25 +51,7 @@ trait ShoppingCartApi extends ShoppingCartApplication with ShoppingCartProtocols
       }
     }
   }
-
-  def CreateShoppingCart = path("carts") {
-    post {
-      entity(as[Caller]) { caller => ctx =>
-        val a = carts ? Cart.Create(User(caller.id, caller.site)) collect {
-          case msg: Created => ctx.complete {
-            HttpResponse(
-              status = StatusCodes.Created,
-              entity = msg.id.value
-            )
-          }
-          case Exists => ctx.complete {
-            HttpResponse(status = StatusCodes.Conflict)
-          }
-        }
-      }
-    }
-  }
-
+  
   def AddArticleToCart = path("carts" / Segment / "articles") { s =>
     val id = ShoppingCartId(s)
     put {
@@ -82,7 +64,7 @@ trait ShoppingCartApi extends ShoppingCartApplication with ShoppingCartProtocols
     }
   }
 
-  def RetriveCartItem = path("carts" / Segment / "articles" / Segment) { (cartId, articleId) =>
+  def RetrieveCartItem = path("carts" / Segment / "articles" / Segment) { (cartId, articleId) =>
     val id = ShoppingCartId(cartId)
     get { ctx =>
       (carts ? Cart.Execute(id, GetContent)) collect {

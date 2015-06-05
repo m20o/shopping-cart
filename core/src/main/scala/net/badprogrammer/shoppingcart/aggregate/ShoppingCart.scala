@@ -19,23 +19,12 @@ class ShoppingCart(private var quantities: Map[Article, Int] = Map.empty, privat
 
   def items: List[Item] = quantities.map { el => Item(el._1, el._2) }.toList
 
-  def isEmpty = quantities.isEmpty
-
-  def nonEmpty = quantities.nonEmpty
-
-  def add(p: (Article, Int)): Unit = add(p._1, p._2)
-
   def add(article: Article, quantity: Int): Unit = {
     val newQuantity = quantities.get(article).map(_ + quantity).getOrElse(quantity)
     quantities = quantities + (article -> newQuantity)
   }
 
-  def apply(article: Article): Option[Int] = quantities.get(article)
-
   def updateQuotation(quotation: (Article, Money)): Unit = {
     quotes = quotes + quotation
-    println(">>> " + quotes)
   }
-
-  def quotations: Map[Item, Money] = for ((article, price) <- quotes; quantity <- quantities.get(article)) yield new Item(article, quantity) -> price
 }
