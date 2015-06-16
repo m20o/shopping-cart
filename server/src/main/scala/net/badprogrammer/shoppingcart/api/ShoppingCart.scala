@@ -8,6 +8,7 @@ case class ShoppingCart(items: List[CartItem]) {
 
   def apply(content: CartContent): ShoppingCart = ShoppingCart(content.items.map(i => CartItem(i.article.id, i.article.id, i.quantity)))
 
+  def item(id: String): Option[CartItem] = items.find(_.id == id)
 }
 
 object CartAdapter {

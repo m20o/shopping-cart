@@ -1,11 +1,9 @@
 package net.badprogrammer.shoppingcart.api
 
-import akka.pattern.ask
 import akka.util.Timeout
 import net.badprogrammer.shoppingcart.command._
-import net.badprogrammer.shoppingcart.domain.{Article, ShoppingCartId, User}
-import net.badprogrammer.shoppingcart.service.Cart.{Created, Execute, Exists}
-import net.badprogrammer.shoppingcart.service.{Cart, ShoppingCartIdGenerator, ShoppingCarts}
+import net.badprogrammer.shoppingcart.domain.{Article, ShoppingCartId}
+import net.badprogrammer.shoppingcart.service.ShoppingCartIdGenerator
 import spray.http.{HttpResponse, StatusCodes}
 import spray.routing.Route
 
@@ -15,28 +13,16 @@ import scala.language.postfixOps
 
 trait ShoppingCartApi extends ShoppingCartApplication with ShoppingCartProtocols {
 
-  implicit def idGenerator: ShoppingCartIdGenerator
+  def idGenerator: ShoppingCartIdGenerator
 
-  implicit val context = ExecutionContext.Implicits.global
-
-  def carts = actorRefFactory.actorOf(ShoppingCarts.props(RandomArticleHandler.reference))
-
-  lazy val service = new ActorSystemGateway(carts, context)
-
-  def routes: Route = CreateShoppingCart ~ AddArticleToCart ~ RetrieveCartItem
-
+  implicit def context = ExecutionContext.Implicits.global
   implicit val timeout = Timeout(3 second)
 
-  def GetShoppingCart = pathPrefix("carts" / Segment) {
-    s =>
-      get {
-        complete {
-          (carts ? Execute(ShoppingCartId(s), GetContent)).mapTo[CartContent].map(CartAdapter.apply)
-        }
-      }
-  }
+  lazy val service = ShoppingCartSystem(actorRefFactory, idGenerator)
 
-  def CreateShoppingCart = path("carts") {
+  def routes: Route = CreateCart ~ PutArticleIntoCart ~ GetCartItem ~ GetCartContent
+
+  def CreateCart = path("carts") {
     post {
       entity(as[Caller]) { caller =>
         complete {
@@ -51,30 +37,34 @@ trait ShoppingCartApi extends ShoppingCartApplication with ShoppingCartProtocols
       }
     }
   }
-  
-  def AddArticleToCart = path("carts" / Segment / "articles") { s =>
+
+  def PutArticleIntoCart = path("carts" / Segment / "articles") { s =>
     val id = ShoppingCartId(s)
     put {
       entity(as[String]) { articleId => ctx =>
         val article = Article(articleId)
-        (carts ? Cart.Execute(id, AddArticle(article))) collect {
+        service.addArticleToCart(id, article).collect {
           case msg: ArticleAdded => ctx.complete(CartItem(msg.article.id, "food", msg.quantity))
         }
       }
     }
   }
 
-  def RetrieveCartItem = path("carts" / Segment / "articles" / Segment) { (cartId, articleId) =>
+  def GetCartItem = path("carts" / Segment / "articles" / Segment) { (cartId, articleId) =>
     val id = ShoppingCartId(cartId)
-    get { ctx =>
-      (carts ? Cart.Execute(id, GetContent)) collect {
-        case content: CartContent => ctx.complete(
-          content.items
-            .find(_.article.id == articleId)
-            .map(a => CartItem(a.article.id, a.article.id, a.quantity))
-        )
+    get {
+      complete {
+        service.load(id).map(CartAdapter.apply).map(_.item(articleId))
       }
     }
   }
 
+  def GetCartContent = path("carts" / Segment) { cartId =>
+    val id = ShoppingCartId(cartId)
+    get {
+      complete {
+        service.load(id).map(CartAdapter.apply)
+      }
+    }
+  }
 }

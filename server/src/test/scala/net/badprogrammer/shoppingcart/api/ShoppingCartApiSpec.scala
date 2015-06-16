@@ -53,5 +53,17 @@ class ShoppingCartApiSpec extends SpraySpec with ShoppingCartApi with BeforeAndA
         responseAs[CartItem] should be(CartItem("food", "food", 3))
       }
     }
+
+    "retrieve the content of a cart" in {
+
+      Put(s"/carts/$cartId/articles", "car") ~> routes ~> check {
+        assert(status == StatusCodes.OK)
+      }
+
+      Get(s"/carts/$cartId") ~> routes ~> check {
+        val thisContent = ShoppingCart(CartItem("food", "food", 3) :: CartItem("car", "car", 1) :: Nil)
+        responseAs[ShoppingCart] should be(thisContent)
+      }
+    }
   }
 }
