@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/m20o/shopping-cart.svg?branch=master)](https://travis-ci.org/m20o/shopping-cart)
 
-# shopping-cart-platform
+# Shopping Cart
        
 This is a study on how to implement a minimal (but realistic) shopping cart system with `DDD` and  `eventsourcing`. Plus, within this project I'd like
 to explore some issues eventually raising when introducing Scala into a fairly large enterprise with a solid Java culture. 

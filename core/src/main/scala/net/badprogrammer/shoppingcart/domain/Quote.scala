@@ -5,6 +5,7 @@ import akka.actor.ActorRef
 trait OriginalSender {
 
   def source: ActorRef
+
 }
 
 case class Quote(source: ActorRef, article: Article, quantity: Int) extends OriginalSender

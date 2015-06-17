@@ -1,12 +1,14 @@
 package net.badprogrammer.shoppingcart.api
 
 import akka.actor.ActorRefFactory
+import akka.pattern.ask
 import akka.util.Timeout
 import net.badprogrammer.shoppingcart.command.{AddArticle, CartContent, ContentEvent, GetContent}
 import net.badprogrammer.shoppingcart.domain.{Article, ShoppingCartId, User}
 import net.badprogrammer.shoppingcart.service.Cart.{Created, Exists}
-import net.badprogrammer.shoppingcart.service.{ShoppingCartIdGenerator, Cart, ShoppingCarts}
-import akka.pattern.ask
+import net.badprogrammer.shoppingcart.service.{Cart, ShoppingCartIdGenerator, ShoppingCarts}
+import spray.http.HttpResponse
+import spray.routing.RequestContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +39,5 @@ object ShoppingCartSystem {
   def apply(factory: ActorRefFactory, generator: ShoppingCartIdGenerator)(implicit context: ExecutionContext): ShoppingCartSystem = new Gateway(factory, generator, context)
 
 }
-
 
 case class Caller(id: String, site: String)

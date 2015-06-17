@@ -57,6 +57,7 @@ trait ShoppingCartApi extends ShoppingCartApplication with ShoppingCartProtocols
         service.load(id).map(CartAdapter.apply).map(_.item(articleId))
       }
     }
+
   }
 
   def GetCartContent = path("carts" / Segment) { cartId =>
