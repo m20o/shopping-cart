@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/m20o/shopping-cart.svg?branch=master)](https://travis-ci.org/m20o/shopping-cart)
+[![Build Status](https://travis-ci.org/m20o/shopping-cart.svg?branch=master)](https://travis-ci.org/m20o/shopping-cart) [![Coverage Status](https://coveralls.io/repos/m20o/shopping-cart/badge.svg)](https://coveralls.io/r/m20o/shopping-cart)
 
 # Shopping Cart
        
