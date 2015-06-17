@@ -1,18 +1,36 @@
+[![Build Status](https://travis-ci.org/m20o/shopping-cart.svg?branch=master)](https://travis-ci.org/m20o/shopping-cart)
+
 # shopping-cart-platform
        
-There are few classes so far:
+This is a study on how to implement a minimal (but realistic) shopping cart system with `DDD` and  `eventsourcing`. Plus, within this project I'd like
+to explore some issues eventually raising when introducing Scala into a fairly large enterprise with a solid Java culture. 
 
- * `ShoppingCart` is the aggregate that represent a shopping cart.
- * `Money` is a value object.
+The following technologies has been used:
+
+ * __Akka__ 2.3.9 as a core framework (using Scala 2.11.x);
+ * __Spray__ 1.3.3 for the REST layer;
+ * __ScalaTest__ 2.2.x for testing.
  
-Every class has a `Spec` under `src/test/scala`
+## What's included so far?
+
+The project so far is divided into two distinct modules:
+
+ * `core` contains the domain-specific parts of the application. Every specific actor should have a decent test suite, i.e. `ShoppingCartAggregate` has its own `ShoppingCartAggregateSpec`;
+ * `server` contains the REST service. The current implementation uses [Spray](http://spray.io/) but, at this time, it is far from satisfactory.
+ 
+## How to run it?
+
+TODO (complete)
+
+Right now you could analyse the system behaviour using the `specs` available on project.
+
 
 ## Getting started
 
-Since this is an [SBT](http://www.scala-sbt.org/) project, you'll need a recent version of Intellij IDEA (tested on 14.x) 
-with Scala plugin in order to open it in a IDE. 
+If yout already know about Scala & SBT you can skip this section.
 
-IDEA can also run Spec tests, so it's highly recommended.
+Since this is an [SBT](http://www.scala-sbt.org/) project, you'll probably need a recent version of Intellij IDEA (tested on 14.x) 
+with Scala plugin in order to open it in a IDE. IDEA can also run Spec tests, so it's highly recommended.
 
 Using a command line is easier to start:
 
@@ -77,5 +95,3 @@ If you want to play around while having your tests running at every changes, pre
 1. Waiting for source changes... (press enter to interrupt)
 ```
 
-
-## Feedback is very welcome!
