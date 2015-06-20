@@ -2,6 +2,7 @@ name := "test-support"
 
 resolvers += "dnvriend at bintray" at "http://dl.bintray.com/dnvriend/maven"
 
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % Versions.Akka,
   "com.typesafe.akka" %% "akka-persistence-experimental" % Versions.Akka,
@@ -12,3 +13,5 @@ libraryDependencies ++= Seq(
   "com.github.nscala-time" %% "nscala-time" % Versions.ScalaTime,
   "org.scalatest" %% "scalatest" % Versions.ScalaTest
 )
+
+ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages := "net\\.badprogrammer\\.platform\\.testsupport\\..*"
